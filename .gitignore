@@ -1,0 +1,12 @@
+./node_modules/
+./reports/
+./report/
+node_modules/
+reports
+report
+allure-report
+.env
+logs
+.DS_Store
+bugreport*
+results/
