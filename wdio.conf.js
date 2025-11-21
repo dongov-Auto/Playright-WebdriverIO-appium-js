@@ -1,48 +1,93 @@
-const { join } = require("node:path");
+const deviceCaps = require("./deviceCapabilities.json");
+const {
+  startAppiumForDevices,
+  stopAllAppiumServers,
+} = require("./config/checkAppiumServer");
 exports.config = {
   runner: "local",
-  port: 4723,
+  specs: [],
 
-  specs: ["./src/tests/features/**/*.feature"],
+  runner: "local",
 
-  maxInstances: 1,
+  maxInstances: deviceCaps.length,
 
-  capabilities: [
-    {
-      platformName: "Android",
-      // "wdio:maxInstances": 1,
-      "appium:deviceName": "emulator-5554",
-      "appium:platformVersion": "16.0",
-      "appium:orientation": "PORTRAIT",
-      "appium:automationName": "UiAutomator2",
+  hostname: "localhost",
+  path: "/",
 
-      "appium:app": join(process.cwd(), "app", "Myf88_sit_581_051125.apk"),
-      "appium:newCommandTimeout": 240,
-      "appium:autoGrantPermissions": true,
-      "appium:autoDismissAlerts": false,
-    },
-  ],
+  capabilities: deviceCaps,
+
+  services: [],
 
   logLevel: "info",
   bail: 0,
   waitforTimeout: 10000,
   connectionRetryTimeout: 90000,
-  connectionRetryCount: 10,
-
-  services: [
-    "appium",
-    "visual",
-    "reportportal",
-    "cucumber-viewport-logger",
-    "rerun",
-  ],
+  connectionRetryCount: 5,
 
   framework: "cucumber",
 
-  reporters: ["spec"],
+  reporters: [
+    "spec",
+    [
+      "allure",
+      {
+        outputDir: "./results/allure-results",
+        disableWebdriverStepsReporting: true,
+        disableWebdriverScreenshotsReporting: false,
+      },
+    ],
+  ],
 
   cucumberOpts: {
     require: ["./src/main/steps/**/*.js"],
     timeout: 60000,
+  },
+  onPrepare: function (config, capabilities) {
+    console.log("🛑 Tests finished, stopping any remaining Appium servers...");
+    startAppiumForDevices();
+  },
+  beforeScenario: async function () {
+    const caps = browser.capabilities;
+
+    const appPath = caps.app || caps["appium:app"];
+    const appPackage = caps.appPackage || caps["appium:appPackage"];
+
+    if (!appPath || !appPackage) {
+      console.warn("Không tìm thấy app hoặc appPackage trong capabilities!");
+      return;
+    }
+
+    try {
+      await browser.activateApp(appPackage);
+      console.log("✓ App started fresh!");
+    } catch (err) {
+      console.warn("Lỗi khi reset và reinstall app:", err.message);
+    }
+  },
+
+  afterScenario: async function (result) {
+    if (!result.passed) {
+      await browser.takeScreenshot();
+    }
+
+    const caps = browser.capabilities;
+    const appPackage = caps.appPackage || caps["appium:appPackage"];
+    console.log(">>> AFTER SCENARIO: đóng app");
+
+    if (!appPackage) {
+      console.warn("Không tìm thấy appPackage trong capabilities!");
+      return;
+    }
+
+    try {
+      await browser.terminateApp(appPackage);
+    } catch (err) {
+      console.warn("Không thể terminate app:", err.message);
+    }
+  },
+  // Optional: stop remaining Appium servers khi test kết thúc
+  onComplete: function () {
+    console.log("🛑 Tests finished, stopping any remaining Appium servers...");
+    stopAllAppiumServers();
   },
 };

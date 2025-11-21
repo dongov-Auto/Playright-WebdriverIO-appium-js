@@ -1,6 +1,8 @@
 // base/BasePage.js
 const { expect } = require("@wdio/globals");
-
+const selector = {
+  base: require("./BaseLocator"),
+};
 class BasePage {
   /**
    * Chờ element hiển thị
@@ -66,6 +68,21 @@ class BasePage {
    */
   async expectEqual(actual, expected) {
     await expect(actual.trim()).toBe(expected.trim());
+  }
+
+  async clickToElementWithButtonDynamic(text) {
+    const element = await selector.base.getLocatorWithButtonDynamic(text);
+    await this.click(element);
+  }
+
+  async clickToElementWithTextDynamic(text) {
+    const element = await selector.base.getLocatorWithTextDynamic(text);
+    await this.click(element);
+  }
+
+  async verifyTextDynamicVisible(text) {
+    const element = await selector.base.getLocatorWithTextDynamic(text);
+    await this.expectDisplayed(element);
   }
 }
 

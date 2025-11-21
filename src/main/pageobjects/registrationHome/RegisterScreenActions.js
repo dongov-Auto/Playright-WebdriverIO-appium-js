@@ -1,4 +1,3 @@
-import page from "../common/BaseActions";
 const BasePage = require("../../core/common/BasePage");
 const selector = {
   register: require("../registrationHome/RegisterScreenLocator"),
@@ -6,11 +5,21 @@ const selector = {
 
 class RegisterScreenActions extends BasePage {
   async clickToToiDongYCacDieuKhoan() {
-    await this.click(selector.register.rdToiDongYDieuKienVaDieuKhoan);
+    const isShown = await $(
+      selector.register.rdToiDongYDieuKienVaDieuKhoan
+    ).catch(() => false);
+
+    if (isShown) {
+      await this.click(selector.register.rdToiDongYDieuKienVaDieuKhoan);
+    }
   }
 
   async clickToTiepTuc() {
-    await this.click(selector.register.btnTiepTuc);
+    const isShown = await $(selector.register.btnTiepTuc).catch(() => false);
+
+    if (isShown) {
+      await this.click(selector.register.btnTiepTuc);
+    }
   }
 
   async clickToEnterButton() {

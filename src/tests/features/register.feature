@@ -1,4 +1,4 @@
-Feature: The Internet Guinea Pig Website
+Feature: The Register
 
   Scenario Outline: Đi đến màn hình đăng ký tài khoản
     When I ignore the updated popup

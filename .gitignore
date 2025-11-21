@@ -10,3 +10,7 @@ logs
 .DS_Store
 bugreport*
 results/
+app/
+deviceCapabilities.json
+featureSplit.json
+appium-logs/

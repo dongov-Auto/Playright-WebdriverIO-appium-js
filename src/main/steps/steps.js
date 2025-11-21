@@ -1,7 +1,6 @@
 import { Given, When, Then } from "@wdio/cucumber-framework";
 import LoginScreen from "../pageobjects/loginHome/LoginScreenActions.js";
 import RegisterScreen from "../pageobjects/registrationHome/RegisterScreenActions.js";
-import page from "../pageobjects/common/BaseActions.js";
 
 Given("I ignore the updated popup", async () => {
   await LoginScreen.ignoreUpdatedPopup();
@@ -12,11 +11,11 @@ When(`I click to Dang Ky button`, async () => {
 });
 
 Then(`I verify {string} is displayed`, async (message) => {
-  await page.verifyTextDynamicVisible(message);
+  await RegisterScreen.verifyTextDynamicVisible(message);
 });
 
 When(`I click on element with text {string}`, async (text) => {
-  await page.clickToElementWithTextDynamic(text);
+  await RegisterScreen.clickToElementWithTextDynamic(text);
 });
 
 When(`I tick the terms and conditions checkbox`, async () => {
@@ -25,7 +24,7 @@ When(`I tick the terms and conditions checkbox`, async () => {
 
 When(`I enter {string}`, async (text) => {
   for (const digit of text) {
-    await page.clickToElementWithButtonDynamic(digit);
+    await RegisterScreen.clickToElementWithButtonDynamic(digit);
   }
 });
 
